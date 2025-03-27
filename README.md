@@ -73,8 +73,8 @@ The tool uses a refined regular expression to ensure that only the proper charac
 
 ## Issues and Contributing
 
-If you encounter a bug or want to see something added/changed, please go ahead and open an [issue](https://github.com/Silent-Watcher/express-admin-honeypot/issues)
-! If you need help with something, feel free to start a [discussion](https://github.com/Silent-Watcher/express-admin-honeypot/discussions/new)!
+If you encounter a bug or want to see something added/changed, please go ahead and open an [issue](https://github.com/Silent-Watcher/branch-lint/issues)
+! If you need help with something, feel free to start a [discussion](https://github.com/Silent-Watcher/branch-lint/discussions/new)!
 
 ## License
 
