@@ -13,7 +13,8 @@ try {
 
 // Regex pattern based on Conventional Branch guidelines
 
-const regex = /^(feature|bugfix|hotfix|release|chore)\/[a-z0-9\-]+$/;
+const regex =
+	/^(main|master|develop|feature\/[a-z0-9\-]+|bugfix\/[a-z0-9\-]+|hotfix\/[a-z0-9\-]+|release\/[a-z0-9\-]+)$/;
 if (regex.test(branch)) {
 	console.log(`Branch "${branch}" is valid!`);
 	process.exit(0);
