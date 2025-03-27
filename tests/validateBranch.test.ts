@@ -21,9 +21,9 @@ describe('isValidBranch', () => {
 		expect(isValidBranch('hotfix/security-patch')).toBe(true);
 	});
 
-	// it('should allow valid release branches', () => {
-	// 	expect(isValidBranch('release/v1.2.0')).toBe(true);
-	// });
+	it('should allow valid release branches', () => {
+		expect(isValidBranch('release/v1.2.0')).toBe(true);
+	});
 
 	it('should reject invalid branch names', () => {
 		expect(isValidBranch('random-branch')).toBe(false);
