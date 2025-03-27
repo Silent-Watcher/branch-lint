@@ -1,188 +1,75 @@
-# express-admin-honeypot 🍯🐝
+# validate-branch
 
 [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A CLI tool to validate Git branch names using Conventional Branch guidelines. This package ensures that your branch names follow consistent naming conventions—supporting core branches like main, master, and develop, as well as structured feature, bugfix, hotfix, and release branches.
-	
+A CLI tool to validate Git branch names using [Conventional Branch](https://conventional-branch.github.io/) guidelines. This package ensures that your branch names follow consistent naming conventions—supporting core branches like main, master, and develop, as well as structured feature, bugfix, hotfix, and release branches.
+
 ## Table of Contents
 
-- [express-admin-honeypot 🍯🐝](#express-admin-honeypot-)
+- [validate-branch](#validate-branch)
 	- [Table of Contents](#table-of-contents)
-	- [Features](#features)
 	- [Installation](#installation)
 	- [Usage](#usage)
-		- [Basic Usage](#basic-usage)
-		- [Redirecting to a Fake URL](#redirecting-to-a-fake-url)
-		- [Custom Fake Admin Page](#custom-fake-admin-page)
-	- [Logger Integration](#logger-integration)
-		- [Using Pino](#using-pino)
-		- [using winston](#using-winston)
-	- [Honeypot Events](#honeypot-events)
-		- [Available Events](#available-events)
-	- [Configuration](#configuration)
+		- [Command Line](#command-line)
+	- [Git Hooks Integration](#git-hooks-integration)
+	- [Branch Naming Conventions](#branch-naming-conventions)
 	- [Issues and Contributing](#issues-and-contributing)
 	- [License](#license)
 	- [Contact](#contact)
 
-## Features
-
-- **Express-only Middleware:** Designed specifically for Express applications.
-- **Configurable Path:** Protects a configurable admin route (default: `/admin`).
-- **Intrusion Logging:** Logs IP address and User-Agent for each access attempt.
-- **Flexible Response:**
-  - Redirects to a configurable fake URL.
-  - Or serves a default (or custom) fake admin HTML page.
-- **Custom Logger Support:** Easily integrate your favorite logging libraries like Pino or Winston.
-- **Simple & Lightweight:** Minimal setup with an easy-to-extend codebase.
-
 ## Installation
 
-Install the package via NPM:
+Install the package globally using npm:
 
-```bash
-npm install node-admin-honeypot
+```sh
+npm install -g validate-branch
+```
+
+Or add it as a development dependency in your project:
+
+```sh
+npm install --save-dev validate-git-branch
 ```
 
 ## Usage
 
-### Basic Usage
+### Command Line
+Once installed, run the CLI command in your Git repository:
 
-Import and use the middleware in your Express application. By default, it will protect the `/admin` path and serve a built-in fake admin page.
-
-```ts
-import express from 'express';
-import {honeypot} from 'express-admin-honeypot';
-
-const app = express();
-
-app.use(honeypot());
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the real app!');
-});
-
-app.listen(3000, () => console.log('Server running on port 3000'));
+```sh
+validate-branch
 ```
 
-![result](./docs/result.png)
+The tool will fetch the current Git branch name and validate it against the conventional naming rules. If the branch name is valid, you'll see a success message; otherwise, an error message will guide you to use the correct format.
 
-### Redirecting to a Fake URL
+## Git Hooks Integration
 
-To redirect attackers to a custom decoy URL instead of serving the default fake admin page, configure the `fakeAdminUrl` option.
+You can integrate this tool with Git hooks to enforce branch naming on every commit or push. For example, using Husky:
 
-```ts
-app.use(honeypot({
-  path: '/admin', // Optional: default is '/admin'
-  fakeAdminUrl: '/decoy-admin',
-}));
-
-app.get('/decoy-admin', (req, res) => {
-  res.send('<h1>Fake Admin</h1><p>This is a decoy page.</p>');
-});
+```sh
+npx husky add .husky/pre-push "validate-branch"
 ```
 
-### Custom Fake Admin Page
+## Branch Naming Conventions
 
-If you want to display a custom HTML page, use the `customHtml` option.
+Your branches should follow one of the following patterns:
+- Core Branches:
+ 	- `main`
+ 	- `master`
+ 	- `develop`
 
-```ts
-app.use(honeypot({
-  customHtml: `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <title>Unauthorized Access</title>
-      </head>
-      <body>
-        <h1>Access Denied</h1>
-        <p>Your attempt has been logged.</p>
-      </body>
-    </html>
-  `,
-}));
-```
+- Feature, Bugfix, and Hotfix Branches:
+  - `feature/branch-name`
+  - `bugfix/branch-name`
+  - `hotfix/branch-name`
 
-## Logger Integration
+- Release Branches:
+ 	- `release/branch-name`
+ 	- Release branches may include dots (e.g., release/v1.2.0)
 
-The middleware allows you to integrate with any logger that has warn, info, or error methods. Below are examples using both Pino and Winston.
-
-### Using Pino
-
-```ts
-import pino from 'pino';
-const logger = pino({ level: 'warn' });
-
-app.use(honeypot({
-  logger,
-}));
-```
-
-### using winston
-
-```ts
-import winston from 'winston';
-
-const logger = winston.createLogger({
-  level: 'warn',
-  transports: [
-    new winston.transports.Console(),
-  ],
-});
-
-app.use(honeypot({
-  logger,
-}));
-```
-
-## Honeypot Events
-
-node-admin-honeypot is designed to be event-driven, allowing you to hook into its operation and extend its functionality with custom logic. This feature is especially useful for integrating additional monitoring, alerting, or even IP-blocking systems when unauthorized access attempts occur.
-
-### Available Events
-
-`honeypotHit`
-
-- Description: Emitted whenever an unauthorized access attempt is detected on the protected admin route.
-- Payload: The event passes an object containing useful details about the intrusion, including:
-  - `ip`: The IP address of the client making the request.
-  - `userAgent`: The user agent string of the client.
-
-```js
-import express from 'express';
-import { honeypot } from 'express-admin-honeypot';
-import EventEmitter from "events";
-
-const honeypotEventEmitter = new EventEmitter();
-honeypotEventEmitter.on('honeypotHit', (data) => {
-  console.log('from events:', data);
-});
-
-const app = express();
-
-app.use(honeypot({
-  eventEmitter: honeypotEventEmitter
-}));
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the real app!');
-});
-
-app.listen(3000, () => console.log('Server running on port 3000'));
-
-```
-
-## Configuration
-
-| Option                     | Type                                      | Remarks                                                                                         |
-| -------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `path`                 | `string`                                  | The admin path to protect. Default is "/admin"                                              |
-|  `fakeAdminUrl`                   | `string`                     | A URL to redirect attackers to (optional).                                                                   |
-|  `customHtml`                 | `string`          | A custom HTML page to display instead of redirecting (optional).                                                 |
-|  `logger`              | `function`                                  | Logger instance (supports Winston, Pino, or any logger with `.info`, `.warn`, or `.error` methods).
-|  `eventEmitter`              | `EventEmitter`                                  | An event emitter instance for handling honeypot-related events.
+The tool uses a refined regular expression to ensure that only the proper characters and structure are allowed for each branch type.
 
 ## Issues and Contributing
 
