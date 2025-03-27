@@ -11,7 +11,7 @@
     "url": "https://alitte.vercel.app/"
   },
   "repository": {
-	"url": ""
+	"url": "https://github.com/Silent-Watcher/branch-lint"
   },
   "description": "A CLI tool to validate Git branch names using Conventional Branch guidelines.",
   "engines": {
